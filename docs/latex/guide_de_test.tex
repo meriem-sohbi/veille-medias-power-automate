@@ -1,0 +1,167 @@
+\documentclass[10pt,a4paper]{article}
+
+% ---------- Mise en page ----------
+\usepackage[a4paper,top=13mm,bottom=18mm,left=15mm,right=15mm,footskip=10mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\IfFileExists{french.ldf}{\usepackage[french]{babel}}{}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{array,tabularx,booktabs}
+\usepackage{enumitem}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,decorations.pathreplacing,calc,babel}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage[hidelinks]{hyperref}
+
+% ---------- Couleurs ----------
+\definecolor{teal}{HTML}{1B7A80}
+\definecolor{ink}{HTML}{1F2933}
+\definecolor{muted}{HTML}{6B7785}
+\definecolor{amber}{HTML}{C9821F}
+\definecolor{ardoise}{HTML}{2F5D8C}
+\definecolor{brique}{HTML}{B04A2F}
+\colorlet{tealfond}{teal!8}
+\colorlet{tealtrait}{teal!35}
+\colorlet{grisfond}{black!4}
+\colorlet{gristrait}{black!22}
+\colorlet{amberfond}{amber!12}
+
+% ---------- Texte ----------
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\setlist{nosep,itemsep=1pt}
+\setlist[enumerate]{leftmargin=1.4em}
+
+% ---------- Titres ----------
+\newcommand{\partie}[2]{%
+  {\Large\bfseries #1.\ \textcolor{teal}{#2}}\par\vspace{3pt}
+  {\color{black!20}\rule{\linewidth}{0.4pt}}\par\vspace{4pt}}
+\newcommand{\lab}[1]{\textbf{#1}}
+% Petits titres colorés selon leur sens, toujours suivis de deux-points :
+%   \cadre    bleu ardoise : cadrer et planifier (questions, périmètre, pilote)
+%   \solution bleu-vert    : ce que fait la solution (déroulement, rôles, données, IA)
+%   \humain   ambre        : les personnes (utilisateurs, formation, adoption, transparence)
+%   \verif    brique       : ce qui reste incertain ou à vérifier (manques, hypothèses, risques)
+% Le bleu-vert et l'ambre ont le même sens que dans les schémas (IA et décision humaine).
+\newcommand{\cadre}[1]{\textbf{\color{ardoise}#1 :}}
+\newcommand{\solution}[1]{\textbf{\color{teal}#1 :}}
+\newcommand{\humain}[1]{\textbf{\color{amber!85!black}#1 :}}
+\newcommand{\verif}[1]{\textbf{\color{brique}#1 :}}
+
+% ---------- Encadrés ----------
+\newtcolorbox{encadre}{colback=tealfond,colframe=tealtrait,boxrule=0.4pt,arc=3pt,
+  left=6pt,right=6pt,top=3pt,bottom=3pt,before skip=4pt,after skip=4pt}
+\newtcolorbox{carte}{colback=grisfond,colframe=gristrait,boxrule=0.4pt,arc=3pt,
+  left=7pt,right=7pt,top=4pt,bottom=4pt,before skip=3pt,after skip=3pt}
+
+% ---------- Tableaux ----------
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\renewcommand{\arraystretch}{1.12}
+
+% ---------- Styles des schémas ----------
+\tikzset{
+  >={Stealth[length=3.2pt]},
+  etape/.style={draw=gristrait, fill=grisfond, rounded corners=2pt, line width=0.4pt,
+    align=center, inner sep=2.5pt, font=\scriptsize},
+  etapeia/.style={etape, draw=teal, fill=tealfond, line width=0.8pt},
+  etapehum/.style={etape, draw=amber, fill=amberfond, line width=0.8pt},
+  fleche/.style={->, draw=muted, line width=0.45pt}}
+\newcommand{\bloc}[2]{\textbf{#1}\\[-0.5pt]{\color{ink!85}#2}}
+
+% ---------- Pied de page ----------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\lfoot{\scriptsize\color{muted}Meriem Sohbi \textperiodcentered{} Cas pratique M6 \textperiodcentered{} Guide de test}
+\rfoot{\scriptsize\color{muted}\thepage\,/\,\pageref{LastPage}}
+
+\color{ink}
+\newtcolorbox{commande}{colback=black!5,colframe=black!18,boxrule=0.4pt,arc=2pt,left=6pt,right=6pt,top=2pt,bottom=2pt,before skip=3pt,after skip=4pt,fontupper=\small\ttfamily}
+\setlist[enumerate]{leftmargin=1.5em,itemsep=2pt}
+\begin{document}
+
+{\LARGE\bfseries Guide de test de la partie fonctionnelle\par}
+\vspace{1pt}
+{\bfseries Synthèse hebdomadaire des tendances médias, solution Power Automate\par}
+\vspace{1pt}
+{\small\color{muted}Meriem Sohbi \textperiodcentered{} Cas pratique M6 \textperiodcentered{} Novembre 2026\par}
+\vspace{3pt}
+{\color{teal}\rule{\linewidth}{1.2pt}}\par\vspace{6pt}
+
+Ce dépôt accompagne le rapport de trois pages (\texttt{docs/rapport\_cas\_pratique.pdf}). Il contient la logique du flux Power Automate décrit dans le rapport et permet de la tester de trois façons, de la plus rapide à la plus complète. Toutes les données sont fictives : chaînes, programmes, sources et chiffres sont inventés.
+
+\cadre{Contenu du dépôt}\par\vspace{1pt}
+{\small
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash\ttfamily}p{0.33\linewidth}L}
+\toprule
+\normalfont\textbf{Élément} & \textbf{Rôle}\\
+\midrule
+demo/index.html & Démonstration dans le navigateur. Elle exécute les trois scripts sur les données du rapport.\\
+office-scripts/1\_Preparer.ts & Période de sept jours, mots exclus, doublons, chiffres divergents, texte envoyé à l’IA.\\
+office-scripts/2\_Controler.ts & Contrôle de la réponse IA, audiences calculées sans IA, écriture du brouillon.\\
+office-scripts/3\_Publier.ts & Version validée après approbation, avec le nom de la personne, et ligne de suivi.\\
+excel/Synthese\_hebdo\_medias.xlsx & Classeur partagé : paramètres, sources, audiences, brouillon et suivi.\\
+power-automate/ & Prompt de l’IA, identique à la consigne du rapport, et fiche de montage du flux en 16 actions.\\
+docs/ & Rapport, guide de test, exemples de sortie et sources LaTeX.\\
+tests/ & Banc d’essai : cinq scénarios, lancés par \texttt{npm test}.\\
+\bottomrule
+\end{tabularx}}
+
+\vspace{8pt}\partie{1}{Démonstration dans le navigateur, environ 2 minutes}
+
+Aucune installation n’est nécessaire.
+\begin{enumerate}
+\item Télécharger le dépôt (bouton Code, puis Download ZIP) ou le cloner, puis ouvrir \texttt{demo/index.html} par un double-clic. Chrome, Edge et Firefox conviennent.
+\item Cliquer sur \textbf{Lancer le flux}. Les étapes Sources, Collecte et Préparation se marquent comme exécutées.
+\item Ouvrir \textbf{Voir ce que reçoit l’IA} pour constater que seuls le titre, l’extrait, la date et la source sont transmis.
+\item Choisir successivement les quatre réponses de l’IA proposées et observer la table Brouillon et l’aperçu.
+\item Dans la table Brouillon, passer un élément à \textbf{Non} dans la colonne Garder et corriger un résumé, comme le ferait le responsable dans Excel.
+\item Cliquer sur \textbf{Approuver sans nom}, puis saisir un nom et cliquer sur \textbf{Approuver}.
+\end{enumerate}
+
+\solution{Résultats attendus}\par\vspace{1pt}
+{\small
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{0.3\linewidth}L}
+\toprule
+\textbf{Étape ou scénario} & \textbf{Ce qui doit apparaître}\\
+\midrule
+Collecte & La source Écran Lab est indisponible après trois tentatives et une alerte est signalée.\\
+Préparation & 15 articles collectés, 1 hors période, 1 exclu par mots-clés, 3 doublons regroupés, 10 sujets envoyés à l’IA. Aucune adresse web ni donnée interne dans le texte transmis.\\
+Réponse correcte & La finale du « Grand Défi » est marquée « à arbitrer » (3,1 et 2,8 millions), la rumeur « à confirmer », et l’article contenant une consigne cachée est écarté.\\
+L’IA invente un chiffre et un nom & Le chiffre 14 et le nom « Jean Duval », absents des sources, sont signalés dans la colonne des contrôles.\\
+Réponse illisible & Le flux continue : chaque élément est proposé avec son extrait, pour une rédaction manuelle.\\
+Export des audiences absent & La partie audiences affiche « Indisponibles cette semaine », sans reprendre d’ancien chiffre.\\
+Approbation sans nom & La publication est refusée par le script 3.\\
+Approbation avec nom & Le message publié reprend la structure de l’exemple du rapport, avec le nom de la personne, et une ligne s’ajoute à la table Suivi.\\
+\bottomrule
+\end{tabularx}}
+
+\vspace{8pt}\partie{2}{Tests automatisés, environ 5 minutes}
+
+\cadre{Prérequis} Node.js 18 ou une version plus récente. TypeScript est téléchargé automatiquement au premier lancement.
+
+Depuis un terminal, à la racine du dépôt :
+\begin{commande}
+npm test
+\end{commande}
+La commande compile les trois scripts en TypeScript strict, sans type \texttt{any}, comme l’exige Office Scripts. Elle exécute ensuite cinq scénarios sur un faux classeur qui reproduit les méthodes Excel utilisées : nominal avec relecture, réponse IA illisible, IA qui invente un chiffre et un nom, audiences absentes, réponse IA entourée de balises de code. Le bilan s’affiche dans le terminal, et les brouillons produits sont enregistrés au format HTML dans \texttt{tests/resultats}. Les mêmes tests sont relancés automatiquement par GitHub Actions à chaque modification du dépôt.
+
+\vspace{8pt}\partie{3}{Montage dans Power Automate, environ 45 minutes}
+
+\verif{Prérequis à vérifier} un environnement Microsoft 365 avec Power Automate, Office Scripts activé, des règles DLP qui autorisent les connecteurs RSS, Excel Online (Business), Approbations et Teams, et des crédits AI Builder ou Copilot pour l’action « Exécuter un prompt ».
+\begin{enumerate}
+\item Déposer \texttt{excel/Synthese\_hebdo\_medias.xlsx} dans une bibliothèque SharePoint.
+\item Dans Excel pour le web, onglet Automatiser, créer trois scripts à partir des fichiers du dossier \texttt{office-scripts}, sous les noms 1\_Preparer, 2\_Controler et 3\_Publier.
+\item Créer le prompt à partir de \texttt{power-automate/prompt\_ai\_builder.txt} et le tester avec \texttt{power-automate/exemple\_elements.json}.
+\item Monter le flux en suivant les 16 actions de \texttt{power-automate/fiche\_de\_montage.md}, puis le lancer à la main avec une ou deux vraies sources.
+\end{enumerate}
+
+\begin{encadre}
+\humain{Ce qui est simulé} dans la démonstration et les tests, la réponse de l’IA provient de réponses préparées au format demandé par le prompt. Le prompt n’a pas été testé avec un vrai modèle, et le flux n’a pas pu être monté faute d’accès à un environnement Microsoft 365. Les noms exacts des champs dynamiques et les licences restent à confirmer dans l’environnement de M6.
+\end{encadre}
+
+\end{document}

@@ -1,0 +1,12 @@
+{
+  "name": "veille-medias-power-automate",
+  "version": "1.0.0",
+  "description": "Synthèse hebdomadaire des tendances médias : flux Power Automate, Office Scripts et IA encadrée par une validation humaine.",
+  "private": true,
+  "scripts": {
+    "test": "node tests/lancer_les_tests.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
